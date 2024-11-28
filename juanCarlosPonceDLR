@@ -1,0 +1,100 @@
+import logging, os
+logging.disable(logging.WARNING)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+from tensorflow import keras
+import matplotlib.pyplot as plt
+import numpy as np
+import keras
+from keras import layers
+import numpy as np
+import keras
+from keras import layers
+from keras.models import Sequential
+from keras.layers import Input
+from keras.layers import Dense, Flatten, Input
+
+
+
+
+num_classes = 10
+
+
+def cargar_y_procesar_cifrar10():
+    (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data() 
+
+    # Normalización de imágenes
+    x_train = x_train.astype("float32") / 255.0
+    x_test = x_test.astype("float32") / 255.0
+
+    # One-hot encoding para las etiquetas
+    y_train = keras.utils.to_categorical(y_train, num_classes)
+    y_test = keras.utils.to_categorical(y_test, num_classes)
+    
+    return x_train, y_train, x_test, y_test
+#Tarea A
+def probar_MLP(x_train, y_train, x_test, y_test, neuronas=[32, 10],
+               activaciones=["sigmoid", "softmax"], epochs=60, batch_size=128):
+    # Crear modelo dinámicamente
+    model = Sequential()
+    model.add(Input(shape=x_train[0].shape))
+    model.add(Flatten())  # Aplanar las imágenes
+    
+    # Añadir capas dinámicamente según las listas de "neuronas" y "activaciones"
+    for n, a in zip(neuronas, activaciones):
+        model.add(Dense(n, activation=a))
+    
+    # Mostrar resumen del modelo
+    model.summary()
+    
+    # Compilación del modelo
+    model.compile(
+        loss="categorical_crossentropy",
+        optimizer="adam",
+        metrics=["accuracy"]
+    )
+    
+    # Entrenamiento del modelo
+    history = model.fit(
+        x_train, y_train,
+        batch_size=batch_size,
+        epochs=epochs,
+        validation_split=0.1,
+        verbose=1
+    )
+    
+    # Evaluar el modelo en el conjunto de prueba
+    score = model.evaluate(x_test, y_test, verbose=0)
+    print("Test loss:", score[0])
+    print("Test accuracy:", score[1])
+    
+    # Graficar precisión
+    plt.figure()
+    plt.title("Precisión durante el entrenamiento")
+    plt.plot(history.history["accuracy"], label="Entrenamiento")
+    plt.plot(history.history["val_accuracy"], label="Validación")
+    plt.xlabel("Épocas")
+    plt.ylabel("Precisión")
+    plt.legend()
+    plt.show()
+    
+    # Graficar la pérdida durante el entrenamiento
+    plt.figure()
+    plt.title("Pérdida durante el entrenamiento")
+    plt.plot(history.history["loss"], label="Entrenamiento")
+    plt.plot(history.history["val_loss"], label="Validación")
+    plt.xlabel("Épocas")
+    plt.ylabel("Pérdida")
+    plt.legend()
+    plt.show()
+    
+
+if __name__ == "__main__":
+    X_train, Y_train, X_test, Y_test = cargar_y_procesar_cifrar10()
+    """
+    #tarea A
+    mlpA = probar_MLP(X_train, Y_train, X_test, Y_test, neuronas=[32,10], activaciones=["sigmoid","softmax"], epochs=50, batch_size=32)
+    """
+    #tarea B
+    
+
+
